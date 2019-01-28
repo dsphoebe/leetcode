@@ -1,41 +1,54 @@
 // Source : https://leetcode-cn.com/problems/divide-two-integers/description/
 // Author : dsphoebe
 // Date   : 2018-11-25
-
+// Update : 2019-01-28
 /**
  * @param {number} dividend
  * @param {number} divisor
  * @return {number}
  */
-
 var divide = function(dividend, divisor) {
-  var MAX_INT = ~(1 << 31)
-  var MIN_INT = 1 << 31
+  var MAX_INT = Math.pow(2, 31) - 1,
+      MIN_INT = -Math.pow(2, 31),
+      result = 0,
+      newDividend = Math.abs(dividend),
+      newDivisor = Math.abs(divisor),
+      flag;
 
-  if (divisor === 0) {
-    return dividend < 0 ? -Infinity : Infinity
+  if (newDividend < newDivisor) {
+    return 0;
   }
 
-  if (divisor === -1 && dividend === MIN_INT) {
-    return MAX_INT
+  if (dividend >= 0 && divisor > 0 || dividend <= 0 && divisor < 0) {
+    flag = 1;
+  } else {
+    flag = -1;
   }
 
-  if (divisor === 1) {
-    return dividend
-  }
+  while (newDividend >= newDivisor) {
+    var temp = newDivisor,
+        i = 0;
 
-  var dvd = Math.abs(dividend) > MAX_INT && MAX_INT || Math.abs(dividend)
-  var dvs = Math.abs(divisor) > MAX_INT && MAX_INT || Math.abs(divisor)
-
-  var res = 0
-
-  while (dvs <= dvd) {
-    var tmp = dvs
-    for (var i = 1; dvd >= tmp; i <<= 1, tmp <<= 1) {
-      dvd -= tmp
-      res += i
+    while (newDividend >= temp << 1) {
+      if ((temp << 1) <= 0) {
+          break;
+      }
+      temp = temp << 1;
+      i++;
+      if (flag > 0 && i > 29) {
+          return MAX_INT;
+      }
+      if (flag < 0 && i > 30) {
+          return MIN_INT;
+      }
     }
+    newDividend -= temp;
+    result += Math.pow(2, i);
   }
 
-  return (dividend < 0) ^ (divisor < 0) ? -res : res
-}
+  if (flag > 0) {
+    return result;
+  } else {
+    return -result;
+  }
+};
